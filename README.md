@@ -36,3 +36,12 @@ Default username and password is hitomi / hitomi.
 hitomi@bf93548550e5:~$ ./hitomi_downloader_GUI.bin
 ```
 Run the binary. You may want to use --disable-gpu and --no-brower option to make the deployment lighter.
+
+### Optional: Use embedded DPI countermeasure
+In hitomi downloader configuration > Network, set proxy as
+* Host: http://127.0.0.1
+* Port: 8080
+
+## Credit
+* [Hitomi-Downloader](https://github.com/KurtBestor/Hitomi-Downloader) by KurtBestor
+* [SpoofDPI](https://github.com/xvzc/SpoofDPI) by xvzc
