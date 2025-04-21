@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  hdl:
+    build: .
+    environment:
+      EUID: ${TARGET_UID}
+      EGID: ${TARGET_GID}
+      UNAME: ${USER_IN_CONTAINER}
+      UPASS: ${PASS_IN_CONTAINER}
+      TZ: Asia/Tokyo
+    volumes:
+      - "./hdl_sqlite.db:/app/hitomi_downloader_GUI.ini"
+      - "./downloaded:/app/hitomi_downloaded"
+    ports:
+      - 36975:6975
+      - 30022:22
