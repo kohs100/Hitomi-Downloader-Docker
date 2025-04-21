@@ -2,7 +2,7 @@ version: "3"
 
 services:
   hdl:
-    build: .
+    image: kohs100/${IMAGE_TAG}:${IMAGE_VER}
     environment:
       EUID: ${TARGET_UID}
       EGID: ${TARGET_GID}
