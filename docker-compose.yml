@@ -2,16 +2,45 @@ version: "3"
 
 services:
   hdl:
-    image: kohs100/${IMAGE_TAG}:${IMAGE_VER}
+    image: kohs100/docker-hdl:latest
     environment:
-      EUID: ${TARGET_UID}
-      EGID: ${TARGET_GID}
-      UNAME: ${USER_IN_CONTAINER}
-      UPASS: ${PASS_IN_CONTAINER}
-      TZ: Asia/Tokyo
+      - EUID=1001       # Set as id -u
+      - EGID=1001       # Set as id -g
+      - TZ=Asia/Tokyo
+      - DISPLAY=xpra:0.0
     volumes:
       - "./hdl_sqlite.db:/app/hitomi_downloader_GUI.ini"
       - "./downloaded:/app/hitomi_downloaded"
     ports:
       - 36975:6975
-      - 30022:22
+    depends_on:
+      xpra:
+        condition: service_healthy
+
+  xpra:
+    image: kohs100/docker-xpra:latest
+    environment:
+      - TZ=Asia/Tokyo
+      - DISPLAY=:0.0
+      # - PORT=8080
+      # - WIDTH=1920
+      # - HEIGHT=1080
+      # - DEPTH=24
+      # - BITPERPIXEL=32
+    ports:
+      - 38080:8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    command: [
+      "--bell=no",
+      "--notifications=no",
+      "--audio=no",
+      "--file-transfer=no",
+      "--webcam=no",
+      "--bandwidth-limit=10Mbps"
+    ]

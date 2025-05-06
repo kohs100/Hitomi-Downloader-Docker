@@ -6,61 +6,54 @@ Dockerized version of HDL by KurtBestor.
 
 - Manage ownership mismatch problem
   - This dockerization effectively solves docker's container-host fs ownership mismatch problem. ([what is ownership mismatch problem?](https://www.joyfulbikeshedding.com/blog/2021-03-15-docker-and-the-host-filesystem-owner-matching-problem.html]))
-- Embedded DPI countermeasure powered by [SpoofDPI](https://github.com/xvzc/SpoofDPI).
 
 ## Usage
 
-### Configure the installation
+### Configuration
 
-Open .env file and configure as you want. You should configure TARGET_UID and TARGET_GID as desired.
-
-### Build the image
+From `docker-compose.yml`:
+```
+services:
+  hdl:
+    image: kohs100/docker-hdl:latest
+    environment:
+      - EUID=1001       # Set as id -u
+      - EGID=1001       # Set as id -g
+      - TZ=Asia/Tokyo
+      - DISPLAY=xpra:0.0
+    volumes:
+      - "./hdl_sqlite.db:/app/hitomi_downloader_GUI.ini"
+      - "./downloaded:/app/hitomi_downloaded"
+    ports:
+      - 36975:6975
+```
+Set proper EUID and EGID as desired. It is recommended to use hdl_sqlite.db as provided otherwise you have it initialized already. You also may want to change port mapping, or disable it if you do not use HTTP API feature.
 
 ```
-$ sudo docker compose build
+  xpra:
+    image: kohs100/docker-xpra:latest
+    environment:
+      - TZ=Asia/Tokyo
+      - DISPLAY=:0.0
+      # - PORT=8080
+      # - WIDTH=1920
+      # - HEIGHT=1080
+      # - DEPTH=24
+      # - BITPERPIXEL=32
+    ports:
+      - 38080:8080
 ```
+You may want to change 38080 into some port you want.
 
 ### Start the container
-
 ```
 $ sudo docker compose up -d
 ```
-
-You may want to change port mapping.
-
-### Initial configuration
-
-By using _USER_IN_CONTAINER_ as username and _PASS_IN_CONTAINER_ as password, connect to the container via SSH. You should enable X passthrough by using -X or -Y option to perform initial configuration of HDL, since it does not enable HTTP API as default.
-
-```
-$ sudo docker ps -a | grep hdl-container
-bf93548550e5   hdl-image:1.0                   "/bin/bash -o pipefa…"   8 minutes ago       Up 8 minutes          0.0.0.0:32786->22/tcp, :::32786->22/tcp, 0.0.0.0:32787->6975/tcp, :::32787->6975/tcp   hdl-container
-```
-
-Host port 36975 is mapped for HTTP API, and 30022 for SSH.
-
-```
-$ ssh hitomi@localhost -p 30022
-```
-
-Default username and password is hitomi / hitomi.
-
-```
-hitomi@bf93548550e5:~$ ./hitomi_downloader_GUI.bin
-```
-
-Run the binary. You may want to use `--no_admin --disable-gpu --no-brower --round_menu=False` option to make the deployment lighter.
+Open http://localhost:38080 to access web interface.
 
 ## Recommended options
 
 In Options > Preferences (F5)
-
-### Use embedded DPI countermeasure
-
-In Network, enable Proxy and set as
-
-- Host: http://127.0.0.1
-- Port: 8080
 
 ### Enable HTTP API
 
@@ -70,9 +63,7 @@ In Advanced, enable _HTTP API_
 
 In Advanced, enable _Run without administrator privileges_.
 
-###
-
 ## Credit
 
 - [Hitomi-Downloader](https://github.com/KurtBestor/Hitomi-Downloader) by KurtBestor
-- [SpoofDPI](https://github.com/xvzc/SpoofDPI) by xvzc
+- [docker-xpra](https://github.com/kohs100/docker-xpra) by me
