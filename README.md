@@ -1,6 +1,6 @@
-# Hitomi-Downloader-Docker
+# docker-hdl
 
-Dockerized version of HDL by KurtBestor.
+Dockerized version of HDL by KurtBestor with web-based interface enabled powered by xpra.
 
 ## Feature
 
